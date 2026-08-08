@@ -1,0 +1,109 @@
+{
+  "_descricao": "Mapa teste estatistico -> referencias que o Julio (Multinivel) cita. 'primaria' = mais usada. Chaves de citacao no formato 'Sobrenome_ano' batem com 03-referencias-apa7. Use a primaria por padrao.",
+  "software": {
+    "R": { "primaria": "R Core Team (ANO)", "nota": "usar ano corrente do relatorio (2025/2026); antigos: 2022" }
+  },
+  "normalidade": {
+    "shapiro_wilk":        { "primaria": "Miot (2017)", "secundarias": ["Razali & Wah (2011)", "Mishra et al. (2019)", "Field (2024)"] },
+    "kolmogorov_smirnov":  { "primaria": "Field (2020)", "secundarias": ["Razali & Wah (2011)", "Thode (2002)"] },
+    "comparacao_normalidade": { "primaria": "Razali & Wah (2011)" },
+    "mardia_multivariada": { "primaria": "Mardia (1970)", "secundarias": ["Li (2016)"] },
+    "levene":              { "primaria": "Shingala & Rajyaguru (2015)", "secundarias": ["Miot (2017)"] },
+    "outliers_cook_mahalanobis": { "primaria": "Cook & Weisberg (1994)", "secundarias": ["Field (2024)"] },
+    "little_mcar":         { "primaria": "Little (1988)" }
+  },
+  "comparacao_nao_parametrica": {
+    "mann_whitney":   { "primaria": "Brunner, Bathke & Konietschke (2018)", "secundarias": ["Field (2024)", "Mishra et al. (2019)"] },
+    "kruskal_wallis": { "primaria": "Pohlert (2014)", "secundarias": ["Brunner, Bathke & Konietschke (2018)", "Kruskal & Wallis (1952)"] },
+    "dunn_posthoc":   { "primaria": "Pohlert (2014)", "secundarias": ["Dunn (1964)"] },
+    "wilcoxon":       { "primaria": "Conover (1999)", "secundarias": ["Brunner, Bathke & Konietschke (2018)"] },
+    "friedman":       { "primaria": "Dancey & Reidy (2018)", "secundarias": ["Zimmerman & Zumbo (1993)"] },
+    "nparld_longitudinal": { "primaria": "Noguchi, Gel, Brunner & Konietschke (2012)", "secundarias": ["Brunner, Bathke & Konietschke (2018)"] }
+  },
+  "comparacao_parametrica": {
+    "teste_t":      { "primaria": "Harris & Hardin (2013)", "secundarias": ["Field (2024)", "Al-Achi (2019)"] },
+    "anova":        { "primaria": "Field (2024)", "secundarias": ["Dancey & Reidy (2018)"] },
+    "welch":        { "primaria": "Shingala & Rajyaguru (2015)" },
+    "games_howell": { "primaria": "Shingala & Rajyaguru (2015)" },
+    "tukey":        { "primaria": "Konietschke et al. (2015)" },
+    "holm_bonferroni": { "primaria": "Chen, Feng & Yi (2017)", "secundarias": ["Pohlert (2014)", "Dunn (1964)"] },
+    "fdr_benjamini_hochberg": { "primaria": "Benjamini & Hochberg (1995)" }
+  },
+  "associacao_categorica": {
+    "qui_quadrado_fisher": { "primaria": "Kim (2017)", "secundarias": ["Hair et al. (2009)"] },
+    "residuos_padronizados_ajustados": { "primaria": "Sharpe (2015)", "secundarias": ["Kim (2017)"] },
+    "v_de_cramer": { "primaria": "Serdar, Cihan, Yücel & Serdar (2021)", "secundarias": ["Kim (2017)"] }
+  },
+  "correlacao": {
+    "pearson":  { "primaria": "Miot (2018)", "secundarias": ["Field (2024)"] },
+    "spearman": { "primaria": "Miot (2018)", "secundarias": ["Field (2024)", "Cohen (1992)"] },
+    "magnitude": { "primaria": "Cohen (1992)", "secundarias": ["Dancey & Reidy (2018)"] }
+  },
+  "tamanho_de_efeito": {
+    "d_cohen":     { "primaria": "Cohen (1988)", "secundarias": ["Serdar, Cihan, Yücel & Serdar (2021)", "Durlak (2009)"] },
+    "rank_biserial": { "primaria": "Serdar, Cihan, Yücel & Serdar (2021)" },
+    "v_cramer":    { "primaria": "Serdar, Cihan, Yücel & Serdar (2021)", "secundarias": ["Kim (2017)"] },
+    "eta_epsilon": { "primaria": "Serdar, Cihan, Yücel & Serdar (2021)", "secundarias": ["Cohen (1988)"] },
+    "diretrizes":  { "primaria": "Cohen (1988, 1992)", "secundarias": ["Gignac & Szodorai (2016)"] }
+  },
+  "confiabilidade": {
+    "alfa_cronbach":  { "primaria": "Bland & Altman (1997)", "secundarias": ["Hayes & Coutts (2020)"] },
+    "omega_mcdonald": { "primaria": "Hayes & Coutts (2020)", "secundarias": ["McDonald (1999)"] },
+    "confiabilidade_composta_ave": { "primaria": "Hair et al. (2009)", "secundarias": ["Jorgensen et al. (2016)"] },
+    "icc":            { "primaria": "Polit (2014)", "secundarias": ["Silove et al. (1993)"] },
+    "kappa_cohen":    { "primaria": "Cohen (1960)", "secundarias": ["Altman (1991)"] },
+    "kappa_fleiss":   { "primaria": "Fleiss (1981)" },
+    "gwet_ac":        { "primaria": "Gwet (2008)" }
+  },
+  "analise_fatorial_exploratoria": {
+    "afe":      { "primaria": "Damásio (2012)", "secundarias": ["Watkins (2018)", "Bandalos & Finney (2018)"] },
+    "kmo":      { "primaria": "Damásio (2012)", "secundarias": ["Kaiser (1974)", "Hutcheson & Sofroniou (1999)"] },
+    "bartlett": { "primaria": "Damásio (2012)" },
+    "analise_paralela_horn": { "primaria": "Horn (1965)", "secundarias": ["Damásio (2012)", "Raiche & Magis (2020)"] },
+    "wlsmv_ordinal": { "primaria": "Li (2016)", "secundarias": ["Finney & DiStefano (2013)"] }
+  },
+  "analise_fatorial_confirmatoria_sem": {
+    "afc":            { "primaria": "Hair et al. (2009)", "secundarias": ["Brown (2015)", "Kline (2016)"] },
+    "indices_ajuste": { "primaria": "Hair et al. (2009)", "secundarias": ["Kline (2016)", "Brown (2015)", "Hu & Bentler (1999)", "Byrne (2013)"] },
+    "invariancia":    { "primaria": "Cheung & Rensvold (2002)", "secundarias": ["Damásio (2013)"] },
+    "mee_sem":        { "primaria": "Kline (2016)", "secundarias": ["Marôco (2010)", "Byrne (2013)"] },
+    "lavaan":         { "primaria": "Rosseel (2012)" },
+    "semtools":       { "primaria": "Jorgensen et al. (2016)" },
+    "dados_nao_normais_sem": { "primaria": "Finney & DiStefano (2013)", "secundarias": ["Li (2016)"] }
+  },
+  "tri": {
+    "grm_samejima": { "primaria": "Samejima (1969)", "secundarias": ["Muraki & Carlson (1995)"] },
+    "mirt":         { "primaria": "Chalmers (2012)" },
+    "teoria_pt":    { "primaria": "Pasquali (2020)", "secundarias": ["Pasquali & Primi (2003)", "Andrade, Laros & Lima (2021)"] },
+    "multidimensional": { "primaria": "Reckase (2009)", "secundarias": ["Cai & Hansen (2013)"] },
+    "introducao":   { "primaria": "Bichi & Talib (2018)", "secundarias": ["Embretson & Reise (2000)"] }
+  },
+  "redes": {
+    "ebicglasso_qgraph": { "primaria": "Epskamp et al. (2012)" },
+    "tutorial":          { "primaria": "Costantini et al. (2015)" },
+    "redes_pt":          { "primaria": "Machado, Vissoci & Epskamp (2015)" },
+    "teoria":            { "primaria": "Newman (2018)" },
+    "centralidade_ponderada": { "primaria": "Opsahl, Agneessens & Skvoretz (2010)" }
+  },
+  "regressao": {
+    "regressao":     { "primaria": "Damásio (2013)", "secundarias": ["Field (2024)"] },
+    "breusch_pagan": { "primaria": "Breusch & Pagan (1979)", "secundarias": ["Astivia & Zumbo (2019)"] },
+    "durbin_watson": { "primaria": "Durbin & Watson (1950)" },
+    "outliers_cook": { "primaria": "Cook & Weisberg (1994)" }
+  },
+  "mediacao_moderacao": {
+    "process": { "primaria": "Hayes (2013, 2017)", "secundarias": ["Prado, Korelo & Silva (2014)"] }
+  },
+  "poder_amostral": {
+    "gpower":           { "primaria": "Faul et al. (2007)", "secundarias": ["Erdfelder, Faul & Buchner (1996)"] },
+    "amostra_psicometria": { "primaria": "Kyriazos (2018)" }
+  },
+  "permanova": {
+    "adonis_vegan":   { "primaria": "Oksanen et al. (2019)" },
+    "pairwise_adonis": { "primaria": "Arbizu (2020)" }
+  },
+  "validade_conteudo": {
+    "validade":  { "primaria": "Sireci & Sukin (2013)", "secundarias": ["AERA, APA & NCME (2014)"] },
+    "standards": { "primaria": "AERA, APA & NCME (2014)" }
+  }
+}

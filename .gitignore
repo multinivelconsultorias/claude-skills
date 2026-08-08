@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+._*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+
+# saídas de trabalho que não pertencem às skills
+saida_figuras/
+saida_tabelas/
+*.rds
+*.parquet
