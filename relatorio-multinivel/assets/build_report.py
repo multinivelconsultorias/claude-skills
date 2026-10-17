@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-build_report.py — Gera um .docx no estilo Multinível/NAOPARE (APA 7).
+build_report.py — Gera um .docx no estilo Multinível (APA 7).
 
 Uso:
     python3 build_report.py conteudo.json saida.docx
 
 Requer: python-docx  (pip install python-docx)
 
+Marcação inline aceita em qualquer texto: **negrito** e *itálico*
+(asteriscos de significância como "5,708*" ou "* p < 0,05" ficam literais).
+
 Formato do JSON de conteúdo (todos os campos opcionais exceto "blocks"):
 {
-  "org": "multinivel" | "naopare",          # define o cabeçalho de 3 linhas
+  "org": "multinivel",                       # cabeçalho de 3 linhas (SEMPRE multinivel;
+                                             #  "naopare" foi descontinuado e cai no default)
   "title": "Relatório de Análise de dados", # linha 1 (default por org)
   "author": "Julio Cezar Albuquerque da Costa",
   "options": {                               # sobrescreve defaults de formatação
@@ -28,7 +32,7 @@ Formato do JSON de conteúdo (todos os campos opcionais exceto "blocks"):
         "note": "Nota. n: frequência; %: percentual."},
      {"type": "figure", "path": "figura_1.png", "caption": "Figura 1. Boxplot dos escores por grupo"},
      {"type": "h1", "text": "Referências"},
-     {"type": "ref", "text": "Miot, H. A. (2017). Avaliação da normalidade..."}
+     {"type": "ref", "text": "Miot, H. A. (2017). Avaliação... *Jornal Vascular Brasileiro, 16*(2)"}
   ]
 }
 """
@@ -50,15 +54,18 @@ DEFAULTS = {
     "margins_cm": 2.5,
     "table_font_size_pt": 10,
     "references_hanging_indent_cm": 1.25,
+    "lang": "pt-BR",
 }
 
 HEADERS = {
     "multinivel": ["Relatório de Análise de dados",
                    "Multinível – Soluções em Psicometria e Análise de dados",
                    "Julio Cezar Albuquerque da Costa"],
+    # NAOPARE descontinuado (set/2026): mantido como alias do cabeçalho Multinível
+    # para que relatórios antigos não quebrem.
     "naopare":    ["Relatório de Análise de dados",
-                   "Núcleo de Atenção Orientada para Resultados – NAOPARE",
-                   "Julio Cezar Albuquerque"],
+                   "Multinível – Soluções em Psicometria e Análise de dados",
+                   "Julio Cezar Albuquerque da Costa"],
 }
 
 
@@ -100,6 +107,40 @@ def style_run(run, size, bold=False, italic=False, font="Times New Roman"):
         rfonts.set(qn(attr), font)
 
 
+# ---------------------------------------------------------------------------
+# Marcação inline: **negrito** e *itálico* (corpo, células, notas, referências).
+# Os delimitadores exigem conteúdo colado (sem espaço) e não podem estar
+# encostados em letra/dígito do lado de fora. Isso preserva os asteriscos de
+# significância ("5,708*", "* p < 0,05; ** p < 0,01; *** p < 0,001").
+# ---------------------------------------------------------------------------
+import re as _re
+_BOLD = _re.compile(r'(?<![*\w])\*\*(?=[^\s*])(.+?)(?<=[^\s*])\*\*(?![*\w])')
+_ITAL = _re.compile(r'(?<![*\w])\*(?=[^\s*])(.+?)(?<=[^\s*])\*(?![*\w])')
+
+
+def parse_inline(text, bold=False, italic=False):
+    segs, pos = [], 0
+    while pos < len(text):
+        cands = [m for m in (_BOLD.search(text, pos), _ITAL.search(text, pos)) if m]
+        if not cands:
+            segs.append((text[pos:], bold, italic))
+            break
+        m = min(cands, key=lambda x: (x.start(), 0 if x.re is _BOLD else 1))
+        if m.start() > pos:
+            segs.append((text[pos:m.start()], bold, italic))
+        if m.re is _BOLD:
+            segs += parse_inline(m.group(1), True, italic)
+        else:
+            segs += parse_inline(m.group(1), bold, True)
+        pos = m.end()
+    return [sg for sg in segs if sg[0]]
+
+
+def add_rich(par, text, size, font, bold=False, italic=False):
+    for t, b, i in parse_inline(str(text), bold, italic):
+        style_run(par.add_run(t), size, bold=b, italic=i, font=font)
+
+
 def fmt_paragraph(p, opt, align=None, space_after=None, first_line_indent=None,
                   line_spacing=None, hanging=None, space_before=None):
     pf = p.paragraph_format
@@ -121,9 +162,7 @@ def add_para(doc, text, opt, size=None, bold=False, italic=False, align=None,
     p = doc.add_paragraph()
     fmt_paragraph(p, opt, align=align, space_after=space_after,
                   first_line_indent=first_line_indent, space_before=space_before)
-    run = p.add_run(text)
-    style_run(run, size if size else opt["body_size_pt"], bold=bold, italic=italic,
-              font=opt["font"])
+    add_rich(p, text, size if size else opt["body_size_pt"], opt["font"], bold=bold, italic=italic)
     return p
 
 
@@ -167,8 +206,7 @@ def add_table(doc, block, opt, trailing_space=12):
         par = merged.paragraphs[0]
         fmt_paragraph(par, opt, align=WD_ALIGN_PARAGRAPH.LEFT, space_after=2,
                       line_spacing=1.0, first_line_indent=0)
-        rr = par.add_run(block["caption"])
-        style_run(rr, opt["body_size_pt"], bold=False, font=opt["font"])
+        add_rich(par, block["caption"], opt["body_size_pt"], opt["font"])
         set_cell_border(merged, top=None, bottom=None, left=None, right=None)
 
     # header row
@@ -178,8 +216,7 @@ def add_table(doc, block, opt, trailing_space=12):
             par = hr[i].paragraphs[0]
             fmt_paragraph(par, opt, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=2,
                           line_spacing=1.0, first_line_indent=0)
-            r = par.add_run(str(htext))
-            style_run(r, tsize, bold=True, font=opt["font"])
+            add_rich(par, str(htext), tsize, opt["font"], bold=True)
             # top border for header (table top) + bottom border (under header)
             set_cell_border(hr[i], top=border, bottom=border, left=None, right=None)
 
@@ -193,8 +230,7 @@ def add_table(doc, block, opt, trailing_space=12):
             align = WD_ALIGN_PARAGRAPH.LEFT if ci == 0 else WD_ALIGN_PARAGRAPH.CENTER
             fmt_paragraph(par, opt, align=align, space_after=2, line_spacing=1.0,
                           first_line_indent=0)
-            r = par.add_run(val)
-            style_run(r, tsize, font=opt["font"])
+            add_rich(par, val, tsize, opt["font"])
             # only bottom border on the very last row (table bottom)
             set_cell_border(cells[ci], top=None,
                             bottom=border if is_last else None,
@@ -211,11 +247,9 @@ def add_table(doc, block, opt, trailing_space=12):
         if note.lower().startswith("nota."):
             r1 = np.add_run("Nota.")
             style_run(r1, tsize, italic=True, font=opt["font"])
-            r2 = np.add_run(note[5:])
-            style_run(r2, tsize, font=opt["font"])
+            add_rich(np, note[5:], tsize, opt["font"])
         else:
-            r = np.add_run(note)
-            style_run(r, tsize, font=opt["font"])
+            add_rich(np, note, tsize, opt["font"])
 
 
 def add_figure(doc, block, opt, trailing_space=12):
@@ -233,6 +267,55 @@ def add_figure(doc, block, opt, trailing_space=12):
     if block.get("caption"):
         add_para(doc, block["caption"], opt, size=opt["body_size_pt"],
                  align=WD_ALIGN_PARAGRAPH.LEFT, first_line_indent=0, space_after=trailing_space)
+
+
+# ---------------------------------------------------------------------------
+# Idioma do documento. Sem isto o Word abre o .docx com o idioma da instalação
+# e sublinha o texto inteiro como erro de digitação. Marca-se o padrão do
+# documento, cada estilo e cada run já escrito.
+# ---------------------------------------------------------------------------
+def _lang_mark(rpr, idioma):
+    lang = rpr.find(qn('w:lang'))
+    if lang is None:
+        lang = OxmlElement('w:lang')
+        rpr.append(lang)
+    lang.set(qn('w:val'), idioma)
+    lang.set(qn('w:eastAsia'), idioma)
+    if lang.get(qn('w:bidi')) is None:
+        lang.set(qn('w:bidi'), 'ar-SA')
+
+
+def _lang_get_or_add(pai, tag):
+    el = pai.find(qn(tag))
+    if el is None:
+        el = OxmlElement(tag)
+        pai.insert(0, el)
+    return el
+
+
+def set_document_language(doc, idioma="pt-BR"):
+    raiz = doc.styles.element
+    defaults = _lang_get_or_add(raiz, 'w:docDefaults')
+    rpr_default = _lang_get_or_add(defaults, 'w:rPrDefault')
+    _lang_mark(_lang_get_or_add(rpr_default, 'w:rPr'), idioma)
+    for estilo in raiz.findall(qn('w:style')):
+        rpr = estilo.find(qn('w:rPr'))
+        if rpr is None:
+            rpr = OxmlElement('w:rPr')
+            estilo.append(rpr)
+        _lang_mark(rpr, idioma)
+    for run in doc.element.body.iter(qn('w:r')):
+        _lang_mark(_lang_get_or_add(run, 'w:rPr'), idioma)
+    try:
+        st = doc.settings.element
+        tfl = st.find(qn('w:themeFontLang'))
+        if tfl is None:
+            tfl = OxmlElement('w:themeFontLang')
+            st.append(tfl)
+        tfl.set(qn('w:val'), idioma)
+        tfl.set(qn('w:eastAsia'), idioma)
+    except Exception:
+        pass
 
 
 def build(content, out_path):
@@ -288,8 +371,7 @@ def build(content, out_path):
             p = doc.add_paragraph()
             fmt_paragraph(p, opt, align=WD_ALIGN_PARAGRAPH.LEFT,
                           hanging=opt["references_hanging_indent_cm"])
-            r = p.add_run(block["text"])
-            style_run(r, opt["body_size_pt"], font=opt["font"])
+            add_rich(p, block["text"], opt["body_size_pt"], opt["font"])
         elif t == "pagebreak":
             doc.add_page_break()
         else:
@@ -298,6 +380,7 @@ def build(content, out_path):
                 add_para(doc, block["text"], opt, align=justify,
                          first_line_indent=opt["first_line_indent_cm"])
 
+    set_document_language(doc, opt.get("lang") or "pt-BR")
     doc.save(out_path)
     print(f"OK -> {out_path}")
 

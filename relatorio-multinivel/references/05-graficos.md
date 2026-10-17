@@ -38,23 +38,92 @@ Legendas reais (modelo de redação):
 
 > Mantêm a sobriedade APA, mas melhoram leitura. Todas em `ggplot2` com um tema-base comum.
 
-### Tema-base Multinível (usar em todos)
+### Tema-base Multinível (usar em todos) — paleta oficial da marca
+
+> **Fonte única de verdade:** o Design System da marca, em
+> `Meu Drive/4. Imagens/Multinível - Sonar/Design System/` (ver `02-Cores.md`, seção
+> "Aplicação em gráficos de dados", e `tokens/tokens.json`). **Não inventar paleta** e não
+> usar a antiga "paleta sóbria" (`#2C5F6F`, `#C0703A`…), que era um placeholder.
+
 ```r
 library(ggplot2)
-tema_multinivel <- function(base_size = 12) {
-  theme_minimal(base_family = "Times New Roman", base_size = base_size) +
+
+# Cores da marca (Design System v1.0)
+MN <- list(esmeralda    = "#00C896",  # primária, série protagonista
+           esmeralda600 = "#0AA37B",  # verde legível sobre fundo claro
+           verde        = "#3DB54A",
+           teal         = "#16697A",  # séries de apoio
+           petroleo     = "#0A2E2E",
+           menta        = "#CFF3EA",  # extremo claro de escalas sequenciais
+           ink          = "#111417", cinza700 = "#3A4747",
+           cinza500     = "#5E6E6E", cinza300 = "#C6D0D0",
+           paper        = "#F5F7F7")
+
+# Ordem de séries categóricas
+PAL <- c(MN$esmeralda, MN$teal, MN$verde, MN$cinza500, "#E6A700")
+
+tema_multinivel <- function(base_size = 12, eixo_x = TRUE) {
+  theme_minimal(base_family = "Times", base_size = base_size) +
     theme(
-      panel.grid.minor = element_blank(),
-      panel.grid.major.x = element_blank(),
-      axis.line = element_line(color = "grey30"),
-      axis.title = element_text(color = "grey20"),
-      plot.title = element_text(face = "bold", size = base_size + 1),
-      plot.caption = element_text(color = "grey40", hjust = 0),
-      legend.position = "bottom"
-    )
+      panel.grid = element_blank(),          # SEM linhas de grade
+      panel.background = element_blank(),
+      plot.background  = element_rect(fill = "white", color = NA),
+      axis.line.x = if (eixo_x)
+        element_line(color = MN$cinza300, linewidth = .5) else element_blank(),
+      axis.ticks = element_blank(),
+      axis.text  = element_text(color = MN$cinza700, size = base_size - 1),
+      axis.title = element_text(color = MN$cinza500, size = base_size - 1),
+      legend.position = "top", legend.justification = "left",
+      plot.margin = margin(10, 18, 8, 8))
 }
-PAL <- c("#2C5F6F", "#C0703A", "#6E8B3D", "#8C4A5F", "#4F6D7A") # paleta sóbria
 ```
+
+**Regras de aplicação (pedido do Julio, set/2026 — os gráficos não podem parecer Excel):**
+- **Sem linhas de grade.** Como não há grade, **todo valor vai rotulado na própria barra**
+  (dentro em branco quando a barra é longa, fora em cinza quando é curta) e o eixo de valores
+  é dispensado. Fica apenas uma linha-base fina em `cinza300`: horizontal nas colunas,
+  **vertical em x = 0** nas barras horizontais.
+- **Cantos arredondados.** Barra desenhada como polígono com arcos nos cantos da ponta
+  (base rente ao eixo), via `geom_polygon` — sem depender de pacote externo. Receita pronta em
+  `assets/figuras_multinivel.R` (funções `barra_h_poly()` e `barra_v_poly()`).
+- **Uma cor protagonista.** A categoria de maior frequência (ou a série de interesse) em
+  **esmeralda**; todas as demais em **teal**. Nunca colorir cada categoria de uma cor
+  diferente sem necessidade.
+- **Esmeralda nunca como texto sobre branco** (não passa em contraste): usar esmeralda 600
+  ou teal.
+- Escalas sequenciais: de **menta `#CFF3EA`** a **petróleo `#0A2E2E`**.
+- **Fonte das figuras: San Francisco** (regra fixa set/2026, aprovada pelo Julio). O corpo do
+  relatório continua em **Times New Roman**; as figuras usam a **San Francisco**, a fonte de
+  sistema da Apple, por contraste e por um acabamento menos formal.
+  **Atenção:** o macOS não expõe a San Francisco como família ao `systemfonts` (o arquivo se
+  declara como "System Font"), de modo que **ela precisa ser registrada a partir do arquivo**.
+  Receita completa em `assets/figuras_multinivel.R`; em resumo:
+  ```r
+  registrar_san_francisco <- function() {
+    reg  <- "/System/Library/Fonts/SFNS.ttf"
+    ital <- "/System/Library/Fonts/SFNSItalic.ttf"
+    if (!file.exists(reg)) return(FALSE)
+    systemfonts::register_font(name = "San Francisco",
+      plain = reg, bold = reg,
+      italic = if (file.exists(ital)) ital else reg,
+      bolditalic = if (file.exists(ital)) ital else reg)
+    TRUE
+  }
+  resolver_fonte <- function(preferidas = c("San Francisco", "Poppins", "Montserrat",
+                                            "Avenir Next", "Helvetica Neue")) {
+    registrar_san_francisco()
+    disp <- unique(c(systemfonts::system_fonts()$family,
+                     systemfonts::registry_fonts()$family))
+    achou <- preferidas[preferidas %in% disp]
+    if (length(achou) == 0) "sans" else achou[1]
+  }
+  FONTE <- resolver_fonte()
+  ```
+  A cascata existe para o script não quebrar fora do macOS: se o arquivo não existir, cai em
+  Poppins e Montserrat (as fontes do Design System), depois Avenir Next e Helvetica Neue.
+- **Ressalva de licença:** a San Francisco é proprietária da Apple. No `.docx` isso é
+  irrelevante, porque a figura entra rasterizada. Se um periódico exigir figura **vetorial**
+  (EPS/PDF), converter o texto em curvas ou regerar com Poppins/Montserrat.
 
 ### 1. Boxplot + jitter + média (melhor que boxplot puro)
 ```r

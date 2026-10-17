@@ -44,7 +44,7 @@ Cai, L., & Hansen, M. (2013). Limited-information goodness-of-fit testing of hie
 
 Chalmers, R. P. (2012). mirt: A multidimensional item response theory package for the R environment. *Journal of Statistical Software, 48*(6), 1–29.
 
-Chen, F., Feng, Y., & Yi, X. (2017). Multiple comparison procedures. *Shanghai Archives of Psychiatry, 29*(6), 374–376.
+Chen, S.-Y., Feng, Z., & Yi, X. (2017). A general introduction to adjustment for multiple comparisons. *Journal of Thoracic Disease, 9*(6), 1725–1729.
 
 Cheung, G. W., & Rensvold, R. B. (2002). Evaluating goodness-of-fit indexes for testing measurement invariance. *Structural Equation Modeling, 9*(2), 233–255.
 
@@ -208,3 +208,17 @@ Zimmerman, D. W., & Zumbo, B. D. (1993). Relative power of the Wilcoxon test, th
 - Autores brasileiros: alguns relatórios usam o nome por extenso em CAIXA ALTA (estilo ABNT). O padrão recente e recomendado é **APA 7** (sobrenome + iniciais), como acima.
 - "Em"/"In" para capítulos; "Orgs."/"Eds." conforme idioma da obra.
 - Há ~327 referências no acervo completo (`master_refs.json`); acima está o núcleo efetivamente reutilizado. Para temas raros (PERMANOVA, mediação, validade de conteúdo), as entradas estão neste arquivo ou no JSON do acervo.
+
+## Acréscimos (set/2026)
+
+Konietschke, F., Placzek, M., Schaarschmidt, F., & Hothorn, L. A. (2015). nparcomp: An R software package for nonparametric multiple comparisons and simultaneous confidence intervals. *Journal of Statistical Software, 64*(9), 1–17.
+
+Tomczak, M., & Tomczak, E. (2014). The need to report effect size estimates revisited: An overview of some recommended measures of effect size. *Trends in Sport Sciences, 21*(1), 19–25.
+
+Brunner, E., & Munzel, U. (2000). The nonparametric Behrens-Fisher problem: Asymptotic theory and a small-sample approximation. *Biometrical Journal, 42*(1), 17–25.
+
+Konietschke, F., Hothorn, L. A., & Brunner, E. (2012). Rank-based multiple test procedures and simultaneous confidence intervals. *Electronic Journal of Statistics, 6*, 738–759.
+
+Konietschke, F., & Pauly, M. (2014). Bootstrapping and permuting paired t-test type statistics. *Statistics and Computing, 24*(3), 283–296.
+
+Neubert, K., & Brunner, E. (2007). A studentized permutation test for the non-parametric Behrens-Fisher problem. *Computational Statistics & Data Analysis, 51*(10), 5192–5204.

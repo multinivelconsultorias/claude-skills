@@ -1,4 +1,4 @@
-# Guia de estilo de escrita — Relatórios Multinível / NAOPARE
+# Guia de estilo de escrita — Relatórios Multinível
 
 > Destilado de 328 relatórios (2020–2026) escritos por Julio Cezar Albuquerque da Costa.
 > Objetivo: reproduzir fielmente a voz do autor, **incluindo seus vícios de linguagem (em dose um pouco menor que o natural)**.
@@ -7,23 +7,20 @@
 
 ## 1. Cabeçalho institucional (3 linhas fixas, sem numeração)
 
-**Multinível:**
+**Sempre Multinível**, independentemente da área do estudo:
 ```
 Relatório de Análise de dados
 Multinível – Soluções em Psicometria e Análise de dados
 Julio Cezar Albuquerque da Costa
 ```
 
-**NAOPARE:**
-```
-Relatório de Análise de dados
-Núcleo de Atenção Orientada para Resultados – NAOPARE
-Julio Cezar Albuquerque
-```
+> **Regra fixa (set/2026):** **nunca usar o cabeçalho NAOPARE.** Relatórios de saúde e
+> epidemiologia também levam o cabeçalho Multinível. O `org` do `build_report.py` é
+> sempre `"multinivel"`.
 
 - O travessão é "–" (en dash), não hífen.
 - Às vezes o título é "Relatório de Consultoria" ou "Relatório psicométrico". O padrão dominante recente (2025–2026) é **"Relatório de Análise de dados"** (só "Relatório" e nomes próprios com maiúscula).
-- Confirmação no corpus: cabeçalho NAOPARE aparece 91×, "Multinível – Soluções em Psicometria e Análise de dados" 12×; a assinatura "Julio Cezar Albuquerque (da Costa)" abre a maioria dos arquivos.
+- O cabeçalho NAOPARE é frequente no acervo histórico (91×), mas foi **descontinuado**: não reproduzi-lo.
 
 ---
 
@@ -74,6 +71,17 @@ Referências              (nem sempre presente; em validação/psicometria, sim)
   - Em vez de: *"Depressão (DASS-21) (p = 0,017; rrb = 0,17, efeito pequeno), com escores superiores entre quem precisou sair de casa"*.
   - Escrever: *"**pessoas que precisaram sair de casa apresentaram maiores níveis de depressão (DASS-21) quando comparadas a quem não precisou sair de casa** (p = 0,017; rrb = 0,17, efeito pequeno)."*
   - Padrão: *"[grupo A] apresentou [maiores/menores] [desfecho] quando comparado a [grupo B] (estatística; tamanho de efeito)."*
+- **Efeitos de modelos fatoriais (ANOVA, nparLD, GEE) — dizer o que significam na prática.**
+  Não parar no ATS/F/χ² de Wald. Após reportar, traduzir: efeito de **grupo** = os grupos diferiram
+  no nível do desfecho considerando os momentos em conjunto; efeito de **momento** = o desfecho
+  mudou ao longo do tempo considerando os grupos em conjunto; **interação** = a diferença entre os
+  grupos não se manteve constante entre os momentos, isto é, os grupos evoluíram de forma distinta.
+  Em seguida, o post hoc diz **quem** mudou e em que direção.
+- **Tamanho de efeito considerável sem significância (amostras pequenas).** Quando houver
+  comparações não significativas com efeito de magnitude **moderada ou superior**, listá-las e
+  registrar que a ausência de significância pode decorrer de limitação do poder amostral, e não
+  necessariamente de ausência de efeito. Se os efeitos não significativos forem **pequenos**,
+  dizê-lo — não estender o argumento do poder a efeitos de fato reduzidos.
 - **Regressão logística — traduzir o OR em chances.** Sempre dizer o que a razão de chances
   significa na prática (OR > 1 aumenta as chances; OR < 1 reduz as chances):
   - Em vez de só: *"variação da Saúde física/mental e vida (QVAS): B = −0,452, OR = 0,64, p = 0,002"*.
@@ -149,6 +157,77 @@ Referências              (nem sempre presente; em validação/psicometria, sim)
 **Caracterização da amostra:**
 - "Contou-se com a participação de N pessoas, com idades variando entre X e Y anos (M= X,XX, DP= X,XX), sendo a maior parte da amostra composta de pessoas do sexo feminino (XX,X%)..."
 - "a maior parte da amostra foi composta de pessoas do sexo masculino (73,79%), autodeclaradas pessoas pardas (66,02%), com ensino médio completo (33,01%)..."
+
+---
+
+## 5.1. O que NÃO entra na seção "Análise de dados" (regra set/2026)
+
+> O relatório é insumo de **peça científica** (artigo, dissertação, tese). O Método relata o
+> que o leitor precisa para **julgar e reproduzir** os resultados, não o diário do tratamento
+> da base.
+
+**Entra:** o software e os testes com suas citações; o tratamento de **dados faltantes** (e
+sobre que denominador os percentuais foram calculados); **exclusão de casos ou registros**, com
+o motivo; **arbitragem entre fontes conflitantes** quando muda o resultado; variáveis que
+**ficaram de fora** e por quê.
+
+**Não entra** (é operação óbvia de preparo, vive no script e no parecer, não no relatório):
+- transformar texto livre ou descrições em categorias, e derivar variáveis desse texto;
+- corrigir erro de digitação, unificar grafia, caixa e acentuação de rótulos;
+- agrupar categorias de baixa frequência, quando o agrupamento já é visível na tabela;
+- coerção de tipo, renomeação de colunas, remoção de linhas vazias;
+- qual coluna redundante foi mantida entre duas equivalentes.
+
+Regra prática: se a frase descreve algo que **qualquer analista faria da mesma forma** e que
+não altera a interpretação do resultado, ela sai do relatório. Se um revisor pudesse
+questionar a escolha, ela fica.
+
+---
+
+## 5.2. O relatório reporta o resultado, não o percurso (regra set/2026 — pedido explícito do Julio)
+
+> Origem: revisão do relatório Jade E3, em que o Julio marcou em **vermelho** (remover) e
+> **amarelo** (vício de IA) trechos com um denominador comum. **Nada disto entra em nenhum
+> relatório gerado por esta skill.**
+
+O Método e os Resultados são peça **publicável**. Descrevem a especificação adotada e o que
+foi encontrado. **Não** descrevem o caminho até ela, o que foi descartado, as limitações do
+ferramental estatístico, nem a diligência do analista.
+
+**Proibido — com os exemplos reais que motivaram a regra:**
+
+| Categoria | Exemplo removido | Por quê |
+|---|---|---|
+| **Narrar o que não pôde ser feito** | "Observou-se que as distribuições gama, normal inversa e de Poisson não puderam ser ajustadas, uma vez que exigem valores estritamente positivos… Investigou-se ainda a família de Tweedie, em 5 valores do parâmetro… Nenhum deles se mostrou estimável" | Tentativas frustradas vivem no script. O relatório informa a distribuição **adotada**. |
+| **Explicar limitação teórica do próprio método** | "considerando que as Equações de Estimação Generalizadas não se apoiam em uma função de verossimilhança plena, razão pela qual não produzem os critérios de informação de Akaike e Bayesiano" | O leitor não precisa de aula sobre o estimador. Diga o que foi feito ("a partir dos resíduos de Pearson") e siga. |
+| **Reportar seleção de componentes acessórios** | "Quanto à matriz de correlação de trabalho, as quatro estruturas comparadas através do QIC apresentaram valores praticamente idênticos… manteve-se a estrutura permutável" | Em GEE, reportar **função de ligação e distribuição**. Estrutura de correlação, otimizador, critérios de convergência ficam de fora. |
+| **Justificar a própria diligência** | "de modo que a distribuição de trabalho não fosse assumida por convenção"; "condição prévia a qualquer escolha de modelo" | Autoelogio metodológico. O rigor aparece no resultado, não no anúncio dele. |
+| **Remeter a arquivos de trabalho** | "As estatísticas completas… encontram-se no arquivo de saída das análises" | **Nunca** mencionar saída, output, CSV, planilha de resultados ou pasta do projeto. Nada disso é publicado. |
+| **Explicar decisão de visualização na legenda** | "Nota. O eixo horizontal foi ajustado à região central de cada distribuição, de modo que valores extremos situam-se fora da área visível." | A legenda nomeia o que a figura mostra. Ajuste de eixo, número de *bins*, transparência e afins não entram. |
+
+**Teste prático:** se a frase descreve **o analista trabalhando** (testou, verificou, descartou,
+constatou que não dava, tomou o cuidado de) em vez de **o estudo encontrando**, ela sai.
+
+---
+
+## 5.3. Dois-pontos explicativo — vício de IA, proibido (regra set/2026)
+
+**Nunca** usar dois-pontos no corpo do texto para anunciar uma explicação, uma conclusão ou
+uma reformulação. É a construção que mais denuncia texto gerado por IA e **não existe** no
+acervo do autor.
+
+- ❌ "A inspeção visual confirma a leitura: a curva normal mostra-se excessivamente achatada…"
+- ✅ "A inspeção visual confirma a leitura, uma vez que a curva normal mostra-se excessivamente achatada…"
+- ❌ "A primeira delas diz respeito à própria variável desfecho: as distribuições apresentaram…"
+- ✅ "A primeira delas diz respeito à própria variável desfecho, cujas distribuições apresentaram…"
+
+Formas de reescrever, na ordem de preferência: oração relativa ("cujo", "o que", "uma vez
+que"), vírgula com conector ("pois", "dado que", "de modo que"), ou dois períodos separados.
+
+**Única exceção mantida:** enumeração anunciada por **"a saber:"** — idioma do próprio autor
+("os oito eletrodos investigados, a saber: Fp1, Fp2, …"). Fora dela, sem dois-pontos.
+
+Vale para o mesmo padrão com travessão e parênteses explicativos em série, já coberto no §7.1.
 
 ---
 
@@ -237,7 +316,7 @@ Abaixo das tabelas, o Julio insere uma **"Nota."** explicando abreviações. Exe
 
 ## 10. Checklist de fidelidade (rodar mentalmente antes de entregar)
 
-- [ ] Cabeçalho de 3 linhas correto (Multinível ou NAOPARE).
+- [ ] Cabeçalho de 3 linhas Multinível (**nunca** NAOPARE).
 - [ ] Voz passiva sintética em 100% das descrições metodológicas.
 - [ ] Cada teste com citação imediata entre parênteses (ver `02-referencias-por-teste`).
 - [ ] Pontos de corte explicitados ao interpretar tamanho de efeito/ajuste.
@@ -248,3 +327,7 @@ Abaixo das tabelas, o Julio insere uma **"Nota."** explicando abreviações. Exe
 - [ ] Títulos no padrão "Tabela N. Título" (acima) / "Figura N. Título" (abaixo).
 - [ ] Nota de rodapé explicando abreviações sob cada tabela.
 - [ ] Seção Referências em APA 7, ordem alfabética, só com o que foi citado.
+- [ ] **Nenhum dois-pontos explicativo no corpo do texto** (só "a saber:") — §5.3.
+- [ ] **Nenhuma menção a arquivo de saída, output, CSV ou pasta do projeto** — §5.2.
+- [ ] **Nenhum relato do que foi testado e descartado**, de limitação do método estatístico, de seleção de estrutura de correlação, nem de autojustificação metodológica — §5.2.
+- [ ] **Legendas de figura sem explicação de ajuste de eixo ou de parâmetro gráfico** — §5.2.

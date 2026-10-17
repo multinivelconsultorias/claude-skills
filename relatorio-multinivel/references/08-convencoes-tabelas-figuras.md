@@ -11,7 +11,9 @@
 - Cada célula traz **n (%)** dentro da coluna (percentual por grupo da variável fixa).
 - A linha-cabeçalho de cada variável carrega a estatística resumo (**p** e **V de Cramér**).
 - **Pós-hoc:** marcar em **negrito** as células cujos resíduos padronizados ajustados
-  têm |SR| ≥ 1,96 (Sharpe, 2015). A nota explica o negrito.
+  têm |SR| ≥ 1,96 (Sharpe, 2015), **somente nas variáveis cujo teste global foi significativo**
+  (p < 0,05). Resíduo de variável sem associação global não se interpreta — marcá-lo contradiz o
+  texto. A nota explica o negrito.
 
 Esqueleto:
 ```
@@ -25,6 +27,15 @@ Tabela N. Frequências e associações de [variáveis] segundo [variável fixa]
 ```
 
 ## 2. Identificação do teste e do tamanho de efeito (regra geral de TODAS as tabelas)
+
+> **Regra set/2026 (prevalece sobre o restante desta seção):** o teste é **nomeado no corpo do
+> texto**, com citação, no parágrafo que apresenta a tabela — ex.: *"Posteriormente, investigaram-se
+> as comparações par a par através de contrastes múltiplos do tipo Tukey (…) e do teste de
+> Brunner-Munzel (…)"*. A **nota da tabela não descreve qual teste foi aplicado**: ela explica
+> abreviações, símbolos de significância, formato dos valores (M (DP), n (%), ρ (p)) e pontos de
+> corte. Não usar símbolos como ᵃ/# para mapear variável→teste; quando a tabela mistura tipos de
+> variável, a nota diz o formato ("numéricas em M (DP) e categóricas em n (%)") e o texto diz o teste.
+
 - **Nunca usar coluna nem linha "Teste".** O teste é identificado por um **símbolo**
   anexado ao nome da variável (ou dito **no título/nota da tabela**, quando a tabela inteira
   usa um único teste) e **explicado na nota**. Vale para **todas** as tabelas de teste —
@@ -129,3 +140,25 @@ Tabela N. Frequências e associações de [variáveis] segundo [variável fixa]
 - **Parágrafos de corpo com recuo de 1ª linha** (1,25 cm).
 - **ANOVA paramétrica:** post hoc com **correção de Holm** (Chen, Feng & Yi, 2017), não Tukey;
   Kruskal-Wallis segue com Dunn + Holm (Pohlert, 2014).
+
+
+---
+
+## 7. Tabelas descritivas — sempre M (DP) (regra set/2026, decisão do Julio)
+
+- Em **toda** tabela descritiva de variável numérica, reportar **M (DP)**, mesmo quando o
+  delineamento é não paramétrico e o texto usa Kruskal-Wallis, Mann-Whitney ou Spearman.
+- **Não** usar mediana com quartis como estatística principal da tabela.
+- **Não** inserir ressalva no corpo do texto sobre o desalinhamento entre a estatística
+  descritiva e o teste empregado. É decisão editorial do autor e não se justifica no relatório.
+- Categóricas seguem em **n (%)** por coluna, como já previsto no §1.
+- Caracterização da amostra vai em **uma única tabela**, com as numéricas em M (DP) e as
+  categóricas em n (%), colunas por grupo. Não fatiar a caracterização em várias tabelas ao
+  longo do relatório.
+
+## 8. Asteriscos de significância dentro das células (regra set/2026)
+
+- Em tabelas de correlação e em mapas de calor, anexar ao coeficiente: `*` p < 0,05,
+  `**` p < 0,01, `***` p < 0,001.
+- Mantê-los **mesmo quando o valor de p já aparece na célula** — a leitura visual é o objetivo.
+- Explicar a convenção na nota da tabela ou da figura.

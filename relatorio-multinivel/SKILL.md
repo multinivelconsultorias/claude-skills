@@ -4,7 +4,7 @@ description: >-
   Gera relatórios de consultoria em análise de dados/psicometria no estilo da empresa Multinível (Julio Cezar).
   Use quando o usuário tiver uma base de dados (.xlsx/.csv/.sav) e quiser: (1) definir ou aplicar um delineamento
   estatístico (testes), (2) gerar código R que roda as análises, e (3) escrever o relatório final no estilo da
-  Multinível/NAOPARE — voz passiva, vícios de linguagem do autor, tabelas APA (Times New Roman 12/tabelas 10,
+  Multinível — voz passiva, vícios de linguagem do autor, tabelas APA (Times New Roman 12/tabelas 10,
   entrelinha 1,5), referências por teste em APA 7, pacotes R habituais e gráficos. Gatilhos: "relatório Multinível",
   "relatório de análise de dados", "analisar essa base e escrever o relatório", "delineamento estatístico",
   "relatório psicométrico", "AFE/AFC/TRI/qui-quadrado e escrever no meu estilo".
@@ -12,7 +12,7 @@ description: >-
 
 # Relatório Multinível — análise de dados + redação no estilo do Julio
 
-Esta skill reproduz o fluxo de consultoria da **Multinível / NAOPARE**: ler a base de dados →
+Esta skill reproduz o fluxo de consultoria da **Multinível**: ler a base de dados →
 definir (ou aplicar) o delineamento estatístico → escrever o código R → rodar as análises →
 **escrever o relatório** fiel ao estilo do autor, cobrindo os 6 tópicos: (1) estilo de escrita,
 (2) formatação, (3) referências por teste, (4) gráficos, (5) APA 7, (6) pacotes R.
@@ -44,7 +44,7 @@ Estão em `references/` (todos destilados de 328 relatórios reais):
 ## Procedimento (siga em ordem)
 
 ### Passo 0 — Entender o pedido e a base
-1. Pergunte/identifique: **Multinível** (psicometria) ou **NAOPARE** (saúde/epidemiologia)? Isso define o cabeçalho.
+1. O cabeçalho é **sempre Multinível**, qualquer que seja a área do estudo (psicometria, saúde, epidemiologia). **Nunca usar NAOPARE.**
 2. Localize a base (`.xlsx`, `.csv`, `.sav`). Se não houver, peça. **Não rode análises ainda no caminho do Drive** — primeiro monte o workspace local (Passo 0.5).
 3. Defina o **nome do projeto** (vira o nome da pasta). Use algo legível, ex.: "Relatório TCC Ricardo", ou o nome do projeto R. Confirme com o usuário se houver dúvida.
 
@@ -82,7 +82,7 @@ Estão em `references/` (todos destilados de 328 relatórios reais):
 
 ### Passo 3 — Escrever o relatório (os 6 tópicos)
 Monte o conteúdo seguindo `01-estilo-de-escrita.md` e `07-templates-trechos.md`:
-1. **Cabeçalho** (3 linhas, Multinível ou NAOPARE).
+1. **Cabeçalho** (3 linhas, sempre Multinível).
 2. **Método › Análise de dados** — adapte o bloco verbatim do template ao delineamento; cada teste com sua citação (`02-referencias-por-teste`).
 3. **Método › Participantes** (se houver caracterização).
 4. **Resultados** — um parágrafo por análise/tabela, com a fórmula "Os resultados podem ser conferidos na Tabela X" + interpretação com pontos de corte. Divida em "Estudo N." se houver múltiplos objetivos.
@@ -113,6 +113,13 @@ Respeite a **dosagem de vícios** (§4 do guia): soar como o autor, sem repetiç
 - Informe ao usuário **os dois caminhos**: o local (`PROJETO_DIR`, onde tudo foi gerado) e o do Drive (cópia final).
 
 ## Regras de ouro
+- **Reprodutibilidade de procedimentos aleatórios.** Todo teste com reamostragem ou simulação
+  (permutação, bootstrap, `fisher.test(simulate.p.value = TRUE)`, `npar.t.test(method = "permu")`,
+  `npar.t.test.paired`) recebe `set.seed()` **imediatamente antes da chamada**. Sem isso o p-valor
+  muda a cada execução e o número publicado não é reproduzível. Conferir rodando o script duas vezes.
+- **Marcação no conteúdo:** o `build_report.py` interpreta `**negrito**` e `*itálico*` em
+  parágrafos, células, notas e referências (itálico de periódico e volume nas referências APA).
+  Asteriscos de significância colados ao número (`5,708*`) ou soltos (`* p < 0,05`) ficam literais.
 - **Local-first sempre.** Trabalhe em `~/Downloads/Relatórios Automatizados/<Projeto>/` (uma pasta por projeto/banco), com a base e os scripts copiados para lá. O Drive recebe **uma única cópia, no fim** (Passo 5). Nunca rode análises lendo/escrevendo direto no Drive.
 - **Voz passiva sintética sempre** ("investigou-se", "utilizou-se", "optou-se"). Nunca 1ª pessoa.
 - **Toda menção a teste vem com a citação** que o Julio usa (Shapiro→Miot 2017; resíduos→Sharpe 2015; qui-quadrado→Kim 2017; Mann-Whitney→Brunner et al. 2018; Kruskal/Dunn→Pohlert 2014; V de Cramér/efeito→Serdar et al. 2021; correlação→Miot 2018; KMO/Bartlett/AFE→Damásio 2012; ajuste→Hair et al. 2009 + Kline 2016; invariância→Cheung & Rensvold 2002; TRI→Samejima 1969/Chalmers 2012/Pasquali 2020).

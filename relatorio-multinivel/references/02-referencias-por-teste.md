@@ -31,6 +31,12 @@
 | Wilcoxon (pareado) | Conover (1999) | Brunner, Bathke & Konietschke (2018) |
 | Friedman (medidas repetidas) | Dancey & Reidy (2018) | Zimmerman & Zumbo (1993) |
 | ANOVA/MANOVA não-paramétrica longitudinal | **Noguchi, Gel, Brunner & Konietschke (2012)** [nparLD] | Brunner, Bathke & Konietschke (2018) |
+| Post hoc do nparLD — pacote | **Konietschke, Placzek, Schaarschmidt & Hothorn (2015)** [nparcomp] | — |
+| Contrastes múltiplos tipo Tukey (3+ condições, t multivariada) | **Konietschke, Hothorn & Brunner (2012)** | — |
+| Brunner-Munzel (2 condições) / efeito relativo p̂ | **Brunner & Munzel (2000)** | — |
+| Brunner-Munzel por permutação, grupos independentes | **Neubert & Brunner (2007)** | — |
+| Brunner-Munzel por permutação, pareado | **Konietschke & Pauly (2014)** | — |
+| W de Kendall (efeito do Friedman) | **Tomczak & Tomczak (2014)** | Cohen (1988) |
 
 ## Comparação de grupos — paramétrica
 

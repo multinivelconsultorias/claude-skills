@@ -1,4 +1,4 @@
-# Especificação de formatação — APA 7 + Word (Multinível / NAOPARE)
+# Especificação de formatação — APA 7 + Word (Multinível)
 
 > Confirmado por inspeção direta dos `.docx` de 2024–2026 (perfil de 328 arquivos +
 > leitura do XML do estilo de tabela). É o que o gerador `assets/build_report.py` aplica.
