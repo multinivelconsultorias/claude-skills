@@ -35,7 +35,8 @@ Estão em `references/` (todos destilados de 328 relatórios reais):
 
 - `assets/setup_workspace.py` — **monta o workspace local-first** em `~/Downloads/Relatórios Automatizados/<Projeto>/`: copia a(s) base(s) e os scripts de apoio para lá e cria `saida_tabelas/`/`saida_figuras/`. Rode no início (ver Passo 0.5).
 - `assets/sync_to_drive.py` — **leva o resultado final para o Drive** (única cópia para o Drive, no fim). Copia entregáveis + figuras + tabelas; `--tudo` copia a pasta inteira.
-- `assets/build_report.py` — gera o `.docx` final já formatado (TNR 12, entrelinha 1,5, 12pt depois, tabelas APA Estilo2, legendas, referências com recuo deslocado). Lê um JSON de conteúdo. Requer `python-docx`.
+- `assets/build_report.py` — gera o `.docx` final já formatado (TNR 12, entrelinha 1,5, 12pt depois, tabelas APA Estilo2, legendas, referências com recuo deslocado). Lê um JSON de conteúdo. **Insere a logo horizontal da Multinível no topo da primeira página** (centralizada, 5,5 cm, acima do cabeçalho de 3 linhas; `logo-multinivel-horizontal.png` ao lado; desligar com `--sem-logo` ou `"options": {"logo": false}`; `logo_largura_cm` ajusta) e **aplica a marca d'água da Multinível por padrão** (ver `marca_dagua.py`; `--sem-marca` desliga). Requer `python-docx`.
+- `assets/marca_dagua.py` — **marca d'água da Multinível** (símbolo rede-M da versão atual da marca, em verde g-600: nós a 16% e traços a 10%, 13 cm, centralizada, atrás do texto, em todas as páginas; gerado a partir do vetor oficial do logo, out/2026). O `build_report.py` importa `marcar_document()` daqui e **já aplica a marca em todo `.docx` gerado** (desligar: `"options": {"marca_dagua": false}` no JSON ou `--sem-marca`; ajustes: `marca_dagua_largura_cm`, `marca_dagua_pular_primeira`). Para relatórios já existentes ou `.pdf`: `python3 marca_dagua.py relatorio.docx` gera `relatorio (marca d'água).docx` (`--no-lugar` sobrescreve, `--pular-primeira` poupa a capa). Usa o `marca-dagua-multinivel.png` ao lado (ambos copiados para o `PROJETO_DIR` pelo `setup_workspace.py`, junto com `logo-multinivel-horizontal.png`). Fonte dos dois PNG (SVG, gerador e versões por tema do site): `2. Multinível/Logos multinível/Logos por tema (site)/` (ver `LEIA-ME.md` e `_fonte/`); a marca d'água antiga, com sombras, segue em `4. Imagens/Multinível - Sonar/Design System/assets/marca-dagua/`.
 - `assets/analise_template.R` — esqueleto de script R que carrega a base, roda o delineamento (descritiva → normalidade → testes → efeito → post hoc; e blocos de AFE/AFC/TRI/redes), exporta tabelas (.csv) e figuras (.png) com o tema Multinível.
 - `assets/explore_data.py` — perfila rapidamente a base (tipos de variável, n, faltantes, níveis) para ajudar a sugerir o delineamento sem depender do R.
 
@@ -55,7 +56,8 @@ Estão em `references/` (todos destilados de 328 relatórios reais):
    ```
    python3 "$SKILL/assets/setup_workspace.py" "<Nome do Projeto>" "<caminho/da/base.xlsx>"
    ```
-   Isso cria `~/Downloads/Relatórios Automatizados/<Nome do Projeto>/` com a(s) base(s) copiada(s), os scripts de apoio (`analise_template.R`, `build_report.py`, `explore_data.py`) e as subpastas `saida_tabelas/` e `saida_figuras/`. Anote o caminho impresso em `PROJETO_DIR=...` — **ele é o diretório de trabalho de tudo a seguir**.
+   Isso cria `~/Downloads/Relatórios Automatizados/<Nome do Projeto>/` com a(s) base(s) copiada(s), os scripts de apoio (`analise_template.R`, `build_report.py`, `explore_data.py`, `marca_dagua.py` e os PNGs da logo e da marca d'água) e as subpastas `saida_tabelas/` e `saida_figuras/`. Anote o caminho impresso em `PROJETO_DIR=...` — **ele é o diretório de trabalho de tudo a seguir**.
+   **Rode este comando mesmo que a pasta do projeto já exista** (projeto antigo, retomado ou criado por outra sessão): ele não apaga nada e **atualiza os scripts de apoio para a versão atual da skill** (pode ser chamado só com o nome do projeto, sem bases). Cada projeto trabalha com uma *cópia* dos scripts; uma cópia antiga de `build_report.py` gera relatório **sem logo e sem marca d'água** (foi o que aconteceu em 22/10/2026). Nunca edite o `build_report.py` dentro do projeto: ajuste pelo `options` do JSON.
 2. **A partir daqui, todos os comandos rodam dentro de `PROJETO_DIR`** (e referenciam scripts/bases por nome simples, pois já estão lá). Nunca leia/escreva intermediários no Drive.
 3. Perfile a base **local**: `python3 explore_data.py <base.xlsx>` (rodando em `PROJETO_DIR`) para saber variáveis, tipos, n e faltantes. Não invente nomes de colunas — confirme.
 
@@ -82,7 +84,7 @@ Estão em `references/` (todos destilados de 328 relatórios reais):
 
 ### Passo 3 — Escrever o relatório (os 6 tópicos)
 Monte o conteúdo seguindo `01-estilo-de-escrita.md` e `07-templates-trechos.md`:
-1. **Cabeçalho** (3 linhas, sempre Multinível).
+1. **Cabeçalho** (3 linhas, sempre Multinível). A logo horizontal entra sozinha acima dele, pelo `build_report.py`; não a repita no conteúdo.
 2. **Método › Análise de dados** — adapte o bloco verbatim do template ao delineamento; cada teste com sua citação (`02-referencias-por-teste`).
 3. **Método › Participantes** (se houver caracterização).
 4. **Resultados** — um parágrafo por análise/tabela, com a fórmula "Os resultados podem ser conferidos na Tabela X" + interpretação com pontos de corte. Divida em "Estudo N." se houver múltiplos objetivos.
@@ -98,6 +100,7 @@ Respeite a **dosagem de vícios** (§4 do guia): soar como o autor, sem repetiç
   python3 -c "import os,sys,runpy; os.chdir('<PROJETO_DIR>'); sys.argv=['build_report.py','conteudo.json','relatorio.docx']; runpy.run_path('build_report.py',run_name='__main__')"
   ```
   Confira depois que o `.docx` tem `word/media/` preenchido e os acentos íntegros (sem mojibake).
+- **Logo e marca d'água:** o `build_report.py` já insere a logo no topo da primeira página (o terminal imprime `Logo Multinível inserida no topo`) e a marca da Multinível em todas as páginas (`Marca d'água Multinível aplicada`; no `.docx`, o cabeçalho traz a imagem `Marca d'água Multinível`). Só desligue se o Julio pedir (`--sem-logo`, `--sem-marca`). Se o relatório também for entregue em `.pdf`, exporte pelo Word (a marca vai junto) ou carimbe o PDF com `python3 marca_dagua.py relatorio.pdf --no-lugar`. **Confira as duas linhas no terminal a cada geração**; o `build_report.py` também imprime a própria versão e avisa `[ATENÇÃO] ... DESATUALIZADO` quando a cópia do projeto está atrás da skill. Se faltar linha ou aparecer `[AVISO]`/`[ATENÇÃO]`, rode `setup_workspace.py "<Nome do Projeto>"` de novo e gere outra vez. Não entregue relatório sem logo e marca d'água.
 - Entregue **ambos**: o `.docx` formatado **e** o Markdown/`.R` fonte (preferência do Julio: "Ambos"). Tudo fica no `PROJETO_DIR`.
 - Rode o **checklist de fidelidade** (§10 do guia) antes de entregar.
 
@@ -121,6 +124,7 @@ Respeite a **dosagem de vícios** (§4 do guia): soar como o autor, sem repetiç
   parágrafos, células, notas e referências (itálico de periódico e volume nas referências APA).
   Asteriscos de significância colados ao número (`5,708*`) ou soltos (`* p < 0,05`) ficam literais.
 - **Local-first sempre.** Trabalhe em `~/Downloads/Relatórios Automatizados/<Projeto>/` (uma pasta por projeto/banco), com a base e os scripts copiados para lá. O Drive recebe **uma única cópia, no fim** (Passo 5). Nunca rode análises lendo/escrevendo direto no Drive.
+- **Logo e marca d'água Multinível em todo relatório** (padrão do `build_report.py` desde out/2026): logo horizontal no topo da primeira página e símbolo rede-M claro atrás do texto, os dois na versão atual da marca (a do site). Não remover sem pedido do Julio.
 - **Voz passiva sintética sempre** ("investigou-se", "utilizou-se", "optou-se"). Nunca 1ª pessoa.
 - **Toda menção a teste vem com a citação** que o Julio usa (Shapiro→Miot 2017; resíduos→Sharpe 2015; qui-quadrado→Kim 2017; Mann-Whitney→Brunner et al. 2018; Kruskal/Dunn→Pohlert 2014; V de Cramér/efeito→Serdar et al. 2021; correlação→Miot 2018; KMO/Bartlett/AFE→Damásio 2012; ajuste→Hair et al. 2009 + Kline 2016; invariância→Cheung & Rensvold 2002; TRI→Samejima 1969/Chalmers 2012/Pasquali 2020).
 - **Sempre explicitar pontos de corte** ao interpretar tamanho de efeito e índices de ajuste.

@@ -4,7 +4,13 @@
 build_report.py — Gera um .docx no estilo Multinível (APA 7).
 
 Uso:
-    python3 build_report.py conteudo.json saida.docx
+    python3 build_report.py conteudo.json saida.docx [--sem-marca] [--sem-logo]
+
+A marca d'água da Multinível (símbolo rede-M, atrás do texto, todas as páginas) é
+aplicada por padrão; --sem-marca ou "options": {"marca_dagua": false} desligam.
+A logo horizontal da Multinível (versão para papel claro) entra centralizada no topo da
+primeira página, acima do cabeçalho de 3 linhas; --sem-logo ou "options": {"logo": false}
+desligam; "logo_largura_cm" (padrão 5,5) ajusta o tamanho.
 
 Requer: python-docx  (pip install python-docx)
 
@@ -19,7 +25,9 @@ Formato do JSON de conteúdo (todos os campos opcionais exceto "blocks"):
   "author": "Julio Cezar Albuquerque da Costa",
   "options": {                               # sobrescreve defaults de formatação
       "space_after_pt": 12, "first_line_indent_cm": 0, "table_font_size_pt": 10,
-      "body_size_pt": 12, "line_spacing": 1.5, "margins_cm": 2.5, "justify": true
+      "body_size_pt": 12, "line_spacing": 1.5, "margins_cm": 2.5, "justify": true,
+      "marca_dagua": true, "marca_dagua_largura_cm": 13, "marca_dagua_pular_primeira": false,
+      "logo": true, "logo_largura_cm": 5.5
   },
   "blocks": [
      {"type": "h1", "text": "Método"},
@@ -36,13 +44,35 @@ Formato do JSON de conteúdo (todos os campos opcionais exceto "blocks"):
   ]
 }
 """
-import sys, json, os
+import sys, json, os, re
 from docx import Document
 from docx.shared import Pt, Cm, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
+
+VERSAO = "2026-10-23"  # data da última mudança de comportamento; comparada com a cópia canônica da skill
+SKILL_CANONICA = os.path.expanduser("~/.claude/skills/relatorio-multinivel/assets")
+
+
+def verificar_versao():
+    """Cada projeto trabalha com uma CÓPIA deste script (setup_workspace.py). Se a skill tiver
+    mudado depois, a cópia gera relatório fora do padrão (ex.: sem logo e sem marca d'água).
+    Avisa alto quando a cópia canônica da skill é mais nova do que este arquivo."""
+    try:
+        canon = os.path.join(SKILL_CANONICA, "build_report.py")
+        aqui = os.path.abspath(__file__)
+        if not os.path.isfile(canon) or os.path.samefile(aqui, canon):
+            return
+        m = re.search(r'^VERSAO = "([^"]+)"', open(canon, encoding="utf-8").read(), re.M)
+        if m and m.group(1) > VERSAO:
+            print(f"[ATENÇÃO] Este build_report.py ({VERSAO}) está DESATUALIZADO em relação à skill ({m.group(1)}).")
+            print(f"          Rode de novo: python3 \"{os.path.join(SKILL_CANONICA, 'setup_workspace.py')}\" \"<Nome do Projeto>\"")
+            print("          (atualiza os scripts de apoio sem apagar nada) e gere o relatório outra vez.")
+    except Exception:
+        pass
+
 
 DEFAULTS = {
     "font": "Times New Roman",
@@ -55,6 +85,17 @@ DEFAULTS = {
     "table_font_size_pt": 10,
     "references_hanging_indent_cm": 1.25,
     "lang": "pt-BR",
+    # Marca d'água da Multinível (símbolo rede-M da versão atual da marca, g-600: nós a 16% e
+    # traços a 10%, atrás do texto, todas as páginas). Aplicada por padrão via marca_dagua.py +
+    # marca-dagua-multinivel.png (ao lado deste script).
+    "marca_dagua": True,
+    "marca_dagua_largura_cm": 13.0,
+    "marca_dagua_pular_primeira": False,
+    # Logo horizontal da Multinível (versão para papel claro) no topo da primeira página,
+    # centralizada, acima do cabeçalho de 3 linhas. logo-multinivel-horizontal.png ao lado deste script.
+    "logo": True,
+    "logo_largura_cm": 5.5,
+    "logo_espaco_pt": 10,
 }
 
 HEADERS = {
@@ -194,7 +235,7 @@ def add_table(doc, block, opt, trailing_space=12):
     ncol = len(header) if header else (len(rows[0]) if rows else 1)
     tbl = doc.add_table(rows=0, cols=ncol)
     tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
-    tsize = opt["table_font_size_pt"]
+    tsize = block.get("font_size_pt", opt["table_font_size_pt"])   # tamanho por tabela (opcional)
     border = {'sz': 4, 'val': 'single', 'color': '000000'}
 
     # título como 1ª linha da tabela: mesclada em todas as colunas e SEM bordas
@@ -318,6 +359,45 @@ def set_document_language(doc, idioma="pt-BR"):
         pass
 
 
+def aplicar_marca_dagua(doc, opt):
+    """Insere a marca d'água da Multinível (símbolo rede-M) em todas as páginas.
+    Usa marca_dagua.py e marca-dagua-multinivel.png, que ficam ao lado deste script
+    (o setup_workspace.py copia os dois para o PROJETO_DIR). Se faltarem, avisa e segue."""
+    aqui = os.path.dirname(os.path.abspath(__file__))
+    png = os.path.join(aqui, "marca-dagua-multinivel.png")
+    if not os.path.isfile(png):
+        print("[AVISO] marca-dagua-multinivel.png não está ao lado do build_report.py: relatório SEM marca d'água.")
+        return 0
+    if aqui not in sys.path:
+        sys.path.insert(0, aqui)
+    try:
+        import marca_dagua
+    except ImportError:
+        print("[AVISO] marca_dagua.py não está ao lado do build_report.py: relatório SEM marca d'água.")
+        return 0
+    n = marca_dagua.marcar_document(doc, png, float(opt.get("marca_dagua_largura_cm", 13.0)),
+                                    bool(opt.get("marca_dagua_pular_primeira", False)))
+    print(f"Marca d'água Multinível aplicada ({n} cabeçalho(s), {opt.get('marca_dagua_largura_cm', 13.0)} cm).")
+    return n
+
+
+def inserir_logo(doc, opt):
+    """Logo horizontal da Multinível (versão para fundo claro) centralizada no topo da primeira
+    página, acima do cabeçalho. Usa logo-multinivel-horizontal.png, que fica ao lado deste script
+    (o setup_workspace.py copia para o PROJETO_DIR). Se faltar, avisa e segue sem a logo."""
+    aqui = os.path.dirname(os.path.abspath(__file__))
+    png = os.path.join(aqui, "logo-multinivel-horizontal.png")
+    if not os.path.isfile(png):
+        print("[AVISO] logo-multinivel-horizontal.png não está ao lado do build_report.py: relatório SEM a logo no topo.")
+        return False
+    p = doc.add_paragraph()
+    fmt_paragraph(p, opt, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=float(opt.get("logo_espaco_pt", 10)),
+                  first_line_indent=0, line_spacing=1.0)
+    p.add_run().add_picture(png, width=Cm(float(opt.get("logo_largura_cm", 5.5))))
+    print(f"Logo Multinível inserida no topo ({opt.get('logo_largura_cm', 5.5)} cm).")
+    return True
+
+
 def build(content, out_path):
     opt = dict(DEFAULTS)
     opt.update(content.get("options", {}) or {})
@@ -334,6 +414,10 @@ def build(content, out_path):
         section.bottom_margin = Cm(opt["margins_cm"])
         section.left_margin = Cm(opt["margins_cm"])
         section.right_margin = Cm(opt["margins_cm"])
+
+    # logo da Multinível no topo da 1ª página (acima do cabeçalho de 3 linhas)
+    if opt.get("logo", True):
+        inserir_logo(doc, opt)
 
     # header (3 lines, centered)
     org = content.get("org", "multinivel")
@@ -380,18 +464,28 @@ def build(content, out_path):
                 add_para(doc, block["text"], opt, align=justify,
                          first_line_indent=opt["first_line_indent_cm"])
 
+    if opt.get("marca_dagua", True):
+        aplicar_marca_dagua(doc, opt)
     set_document_language(doc, opt.get("lang") or "pt-BR")
     doc.save(out_path)
     print(f"OK -> {out_path}")
 
 
 def main():
-    if len(sys.argv) < 3:
+    print(f"build_report.py {VERSAO}")
+    verificar_versao()
+    flags = {a for a in sys.argv[1:] if a.startswith("--")}
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    if len(args) < 2:
         print(__doc__)
         sys.exit(1)
-    with open(sys.argv[1], encoding="utf-8") as fh:
+    with open(args[0], encoding="utf-8") as fh:
         content = json.load(fh)
-    build(content, sys.argv[2])
+    if "--sem-marca" in flags:
+        content.setdefault("options", {})["marca_dagua"] = False
+    if "--sem-logo" in flags:
+        content.setdefault("options", {})["logo"] = False
+    build(content, args[1])
 
 
 if __name__ == "__main__":

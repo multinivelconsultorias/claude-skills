@@ -12,10 +12,12 @@ Estrutura criada:
         <Nome do Projeto>/                       <- uma pasta por projeto/banco
             <base copiada>.xlsx
             analise_template.R  build_report.py  explore_data.py
+            marca_dagua.py  marca-dagua-multinivel.png  logo-multinivel-horizontal.png
             saida_tabelas/   saida_figuras/
 
 Uso:
     python3 setup_workspace.py "<Nome do Projeto>" "<base1>" ["<base2>" ...]
+    python3 setup_workspace.py "<Nome do Projeto>"            # só atualiza os scripts de um projeto existente
 
 Exemplo:
     python3 setup_workspace.py "Relatório TCC Ricardo" \\
@@ -35,12 +37,15 @@ import sys
 import shutil
 
 PASTA_GERAL = "Relatórios Automatizados"
-SCRIPTS_SKILL = ("analise_template.R", "build_report.py", "explore_data.py")
+SCRIPTS_SKILL = ("analise_template.R", "build_report.py", "explore_data.py",
+                 "marca_dagua.py", "marca-dagua-multinivel.png",   # marca d'água Multinível
+                 "logo-multinivel-horizontal.png")                  # logo do topo da 1ª página
 
 
 def main():
-    if len(sys.argv) < 3:
-        print('Uso: python3 setup_workspace.py "<Nome do Projeto>" "<base1>" ["<base2>" ...]')
+    if len(sys.argv) < 2:
+        print('Uso: python3 setup_workspace.py "<Nome do Projeto>" ["<base1>" "<base2>" ...]')
+        print('     (só com o nome do projeto: atualiza os scripts de apoio de um projeto já existente)')
         sys.exit(1)
 
     projeto = sys.argv[1].strip()
@@ -65,15 +70,29 @@ def main():
         copiadas.append(dst)
         print(f"  base   -> {os.path.basename(dst)}")
 
-    # 2. Copiar os scripts de apoio da skill (mesma pasta deste arquivo)
+    # 2. Copiar os scripts de apoio da skill (mesma pasta deste arquivo). Em projeto já
+    #    existente, ATUALIZA as cópias (guardando a anterior se for diferente): uma cópia
+    #    antiga de build_report.py gera relatório fora do padrão (sem logo/marca d'água).
+    import filecmp, time
     assets_dir = os.path.dirname(os.path.abspath(__file__))
+    carimbo = time.strftime("%Y%m%d-%H%M")
     for nome in SCRIPTS_SKILL:
         src = os.path.join(assets_dir, nome)
-        if os.path.isfile(src):
-            shutil.copy2(src, os.path.join(pasta_proj, nome))
+        dst = os.path.join(pasta_proj, nome)
+        if not os.path.isfile(src):
+            print(f"  [AVISO] faltando na skill: {nome}")
+            continue
+        if os.path.isfile(dst) and not filecmp.cmp(src, dst, shallow=False):
+            shutil.copy2(dst, f"{dst}.anterior-{carimbo}")
+            shutil.copy2(src, dst)
+            print(f"  script ATUALIZADO -> {nome} (versão anterior guardada como {nome}.anterior-{carimbo})")
+        elif os.path.isfile(dst):
+            print(f"  script ok -> {nome}")
+        else:
+            shutil.copy2(src, dst)
             print(f"  script -> {nome}")
 
-    if not copiadas:
+    if bases and not copiadas:
         print("\n  [AVISO] Nenhuma base foi copiada. Confira os caminhos informados.")
 
     # Linha machine-readable com o diretório do projeto

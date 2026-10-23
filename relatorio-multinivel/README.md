@@ -30,7 +30,10 @@ relatorio-multinivel/
 └── assets/
     ├── setup_workspace.py           # monta o workspace local em Downloads e copia base+scripts
     ├── sync_to_drive.py             # leva o resultado final para o Drive (1 cópia, no fim)
-    ├── build_report.py              # gera o .docx final formatado (a partir de JSON)
+    ├── build_report.py              # gera o .docx final formatado (a partir de JSON); logo no topo + marca d'água
+    ├── marca_dagua.py               # aplica a marca d'água (símbolo rede-M) em .docx e .pdf
+    ├── marca-dagua-multinivel.png   # marca d'água (versão atual da marca, g-600 a 16%/10%)
+    ├── logo-multinivel-horizontal.png # logo horizontal para papel claro (topo da 1ª página)
     ├── analise_template.R           # esqueleto de análise (descritiva→testes→AFE/AFC/TRI/redes)
     └── explore_data.py              # perfila a base e sugere o delineamento
 ```
@@ -47,7 +50,7 @@ e só o resultado final é sincronizado para o Drive:
 3. `sync_to_drive.py "<pasta local>" "<destino no Drive>"` → leva só o resultado final ao Drive.
 
 ## Saída
-- `.docx` final formatado (APA 7, TNR 12, tabelas 10pt estilo APA, entrelinha 1,5, 12pt entre parágrafos).
+- `.docx` final formatado (APA 7, TNR 12, tabelas 10pt estilo APA, entrelinha 1,5, 12pt entre parágrafos), com a logo da Multinível no topo da primeira página e a marca d'água em todas as páginas.
 - Markdown/`.R` fonte com o código das análises (preferência: entregar ambos).
 
 ## Base do conhecimento
@@ -56,5 +59,6 @@ Uma cópia desta base também fica na pasta de trabalho (`_Skill Multinível/`) 
 
 ## Manutenção
 - Para ajustar o estilo: edite os arquivos em `references/`.
-- Para mudar a formatação do `.docx`: edite os `DEFAULTS` no topo de `assets/build_report.py`.
+- Para mudar a formatação do `.docx`: edite os `DEFAULTS` no topo de `assets/build_report.py` (inclusive `logo`, `logo_largura_cm`, `marca_dagua`).
+- Para trocar a logo ou a marca d'água: os PNG vêm de `2. Multinível/Logos multinível/Logos por tema (site)/` (pasta `claro/` e `_fonte/`).
 - Novas referências: acrescente em `03-referencias-apa7.md` e mapeie em `02-referencias-por-teste.*`.

@@ -42,6 +42,9 @@ def copiar_match(origem, destino, padroes=None):
         # ignora locks/temporários do Office, LibreOffice e macOS
         if nome.startswith("~$") or nome.startswith(".~") or nome.startswith(".#") or nome == ".DS_Store" or nome.endswith(".tmp"):
             continue
+        # os PNG da marca d'água e da logo são insumos (vêm da skill), não entregáveis
+        if nome in ("marca-dagua-multinivel.png", "logo-multinivel-horizontal.png"):
+            continue
         if padroes is None or any(fnmatch.fnmatch(nome, p) for p in padroes):
             shutil.copy2(cam, os.path.join(destino, nome))
             print(f"  -> {nome}")
