@@ -12,7 +12,7 @@ Estrutura criada:
         <Nome do Projeto>/                       <- uma pasta por projeto/banco
             <base copiada>.xlsx
             analise_template.R  build_report.py  explore_data.py
-            marca_dagua.py  marca-dagua-multinivel.png  logo-multinivel-horizontal.png
+            template_multinivel.py  marca_dagua.py  + PNGs do cabeçalho, rodapé, marca d'água e logo
             saida_tabelas/   saida_figuras/
 
 Uso:
@@ -38,8 +38,9 @@ import shutil
 
 PASTA_GERAL = "Relatórios Automatizados"
 SCRIPTS_SKILL = ("analise_template.R", "build_report.py", "explore_data.py",
-                 "marca_dagua.py", "marca-dagua-multinivel.png",   # marca d'água Multinível
-                 "logo-multinivel-horizontal.png")                  # logo do topo da 1ª página
+                 "template_multinivel.py", "marca_dagua.py",        # identidade visual (modelo 23/10/2026)
+                 "cabecalho-multinivel.png", "rodape-multinivel.png", "marca-dagua-multinivel.png",
+                 "logo-multinivel-horizontal.png")                  # logo avulsa (opcional, desligada)
 
 
 def main():

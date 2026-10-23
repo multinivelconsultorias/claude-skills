@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Aplica a marca d'água da Multinível (símbolo rede-M da versão atual da marca, tom claro) em relatórios
+Aplica a marca d'água da Multinível (símbolo rede-M em g-600 a 14%, nós vazados com sombra) em relatórios
 .docx e .pdf, centralizada na página, atrás do texto, em todas as páginas.
 
 Uso:

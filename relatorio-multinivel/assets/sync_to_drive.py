@@ -43,7 +43,7 @@ def copiar_match(origem, destino, padroes=None):
         if nome.startswith("~$") or nome.startswith(".~") or nome.startswith(".#") or nome == ".DS_Store" or nome.endswith(".tmp"):
             continue
         # os PNG da marca d'água e da logo são insumos (vêm da skill), não entregáveis
-        if nome in ("marca-dagua-multinivel.png", "logo-multinivel-horizontal.png"):
+        if nome in ("marca-dagua-multinivel.png", "logo-multinivel-horizontal.png", "cabecalho-multinivel.png", "rodape-multinivel.png"):
             continue
         if padroes is None or any(fnmatch.fnmatch(nome, p) for p in padroes):
             shutil.copy2(cam, os.path.join(destino, nome))
